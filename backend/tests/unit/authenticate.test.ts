@@ -20,7 +20,7 @@ import { env } from '../../src/config/env';
 import { UnauthorizedError } from '../../src/types/errors';
 
 // Use the same secret the middleware uses (env singleton parsed from .env)
-const SECRET = env.JWT_SECRET;
+const SECRET = env.JWT_ACCESS_SECRET;
 
 function makeToken(payload: object, secret = SECRET, options?: jwt.SignOptions): string {
   return jwt.sign(payload, secret, options);
