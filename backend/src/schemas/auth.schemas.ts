@@ -7,6 +7,7 @@
  */
 
 import { z } from 'zod';
+import { Role } from '@prisma/client';
 
 export const RegisterSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
@@ -15,7 +16,7 @@ export const RegisterSchema = z.object({
     .string()
     .min(8, 'Password must be at least 8 characters')
     .max(72, 'Password must be at most 72 characters'), // bcrypt max input length
-  role: z.enum(['ORGANIZER', 'CUSTOMER']),
+  role: z.nativeEnum(Role).optional().default('CUSTOMER'),
 });
 
 export const LoginSchema = z.object({

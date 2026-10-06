@@ -15,6 +15,7 @@
 import bcrypt from 'bcrypt';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 import { prisma } from '../config/db';
+import { Role } from '@prisma/client';
 import { env } from '../config/env';
 import { ConflictError, UnauthorizedError } from '../types/errors';
 import type { RegisterInput, LoginInput } from '../schemas/auth.schemas';
@@ -24,7 +25,7 @@ import type { RegisterInput, LoginInput } from '../schemas/auth.schemas';
 export interface AuthTokenPayload {
   sub: string;   // user id
   email: string;
-  role: 'ORGANIZER' | 'CUSTOMER';
+  role: Role;
 }
 
 export interface AuthResult {
@@ -33,7 +34,7 @@ export interface AuthResult {
     id: string;
     name: string;
     email: string;
-    role: 'ORGANIZER' | 'CUSTOMER';
+    role: Role;
   };
 }
 

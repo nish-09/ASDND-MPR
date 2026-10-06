@@ -16,6 +16,7 @@
 
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { Role } from '@prisma/client';
 import { env } from '../config/env';
 import { UnauthorizedError } from '../types/errors';
 import type { RequestUser } from '../types/express';
@@ -34,7 +35,7 @@ export function authenticate(req: Request, _res: Response, next: NextFunction): 
     if (
       typeof decoded.sub !== 'string' ||
       typeof decoded.email !== 'string' ||
-      (decoded.role !== 'ORGANIZER' && decoded.role !== 'CUSTOMER')
+      !Object.values(Role).includes(decoded.role as Role)
     ) {
       throw new Error('Malformed token payload');
     }
@@ -44,7 +45,7 @@ export function authenticate(req: Request, _res: Response, next: NextFunction): 
     (req as Request & { user: RequestUser }).user = {
       id: decoded.sub,
       email: decoded.email,
-      role: decoded.role as 'ORGANIZER' | 'CUSTOMER',
+      role: decoded.role as Role,
     };
 
     next();

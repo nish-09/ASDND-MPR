@@ -4,89 +4,107 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Seeding database...');
+  console.log('Seeding QueueLess database...');
 
-  // Create an Organizer User
-  const passwordHash = await bcrypt.hash('password123', 10);
-  
-  const organizer = await prisma.user.upsert({
-    where: { email: 'organizer@example.com' },
-    update: {},
-    create: {
-      email: 'organizer@example.com',
-      name: 'EventBook Mock Organizer',
+  // Clean existing data for idempotency
+  await prisma.outboxEvent.deleteMany();
+  await prisma.notification.deleteMany();
+  await prisma.queueEntry.deleteMany();
+  await prisma.appointment.deleteMany();
+  await prisma.service.deleteMany();
+  await prisma.providerAvailability.deleteMany();
+  await prisma.tokenCounter.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.provider.deleteMany();
+
+  const passwordHash = await bcrypt.hash('password123', 12);
+
+  // 1. ADMIN
+  await prisma.user.create({
+    data: {
+      email: 'admin@queueless.com',
+      name: 'System Admin',
       passwordHash,
-      role: 'ORGANIZER',
+      role: 'ADMIN',
     },
   });
 
-  console.log('Organizer created:', organizer.email);
+  // 2. Providers
+  const p1 = await prisma.provider.create({
+    data: {
+      name: 'Dr. Smith Clinic',
+      category: 'Healthcare',
+      timezone: 'Asia/Kolkata',
+      services: {
+        create: [
+          { name: 'General Consultation', durationMin: 15 },
+          { name: 'Follow-up', durationMin: 10 },
+        ],
+      },
+      availabilities: {
+        create: [1, 2, 3, 4, 5].map((weekday) => ({
+          weekday,
+          startMin: 9 * 60, // 09:00
+          endMin: 17 * 60,  // 17:00
+        })),
+      },
+    },
+    include: { services: true },
+  });
 
-  // Generate some future dates
-  const now = new Date();
-  const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const nextMonth = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-  const twoMonths = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
+  const p2 = await prisma.provider.create({
+    data: {
+      name: 'City Bank Branch',
+      category: 'Banking',
+      timezone: 'Asia/Kolkata',
+      services: {
+        create: [
+          { name: 'Account Opening', durationMin: 30 },
+          { name: 'Loan Enquiry', durationMin: 45 },
+        ],
+      },
+      availabilities: {
+        create: [1, 2, 3, 4, 5].map((weekday) => ({
+          weekday,
+          startMin: 10 * 60, // 10:00
+          endMin: 16 * 60,   // 16:00
+        })),
+      },
+    },
+    include: { services: true },
+  });
 
-  // Mock Events
-  const events = [
-    {
-      title: 'Global Tech Summit 2026',
-      description: 'The premier technology conference featuring keynotes from industry leaders.',
-      venue: 'Moscone Center, San Francisco',
-      startTime: nextMonth,
-      totalSeats: 500,
-      availableSeats: 500,
-      price: 19900, // $199.00
-      organizerId: organizer.id,
+  // 3. STAFF per provider
+  await prisma.user.create({
+    data: {
+      email: 'staff1@smithclinic.com',
+      name: 'Clinic Receptionist',
+      passwordHash,
+      role: 'STAFF',
+      providerId: p1.id,
     },
-    {
-      title: 'Neobrutalism UI Workshop',
-      description: 'A hands-on workshop learning the boldest design trend of the year.',
-      venue: 'Design Hub, New York',
-      startTime: nextWeek,
-      totalSeats: 50,
-      availableSeats: 2, // Almost sold out
-      price: 4900, // $49.00
-      organizerId: organizer.id,
-    },
-    {
-      title: 'Summer Indie Music Fest',
-      description: 'Three days of non-stop indie music in the beautiful outdoors.',
-      venue: 'Golden Gate Park, San Francisco',
-      startTime: twoMonths,
-      totalSeats: 5000,
-      availableSeats: 5000,
-      price: 8500, // $85.00
-      organizerId: organizer.id,
-    },
-    {
-      title: 'Free Community Yoga',
-      description: 'Relax and unwind with a free community yoga session.',
-      venue: 'Central Park, New York',
-      startTime: nextWeek,
-      totalSeats: 100,
-      availableSeats: 100,
-      price: 0, // Free event
-      organizerId: organizer.id,
-    },
-    {
-      title: 'AI Engineering Conference',
-      description: 'Deep dive into building agentic systems and LLM integrations.',
-      venue: 'ExCeL London, UK',
-      startTime: nextMonth,
-      totalSeats: 200,
-      availableSeats: 200,
-      price: 29900, // $299.00
-      organizerId: organizer.id,
-    }
-  ];
+  });
 
-  for (const eventData of events) {
-    const event = await prisma.event.create({
-      data: eventData,
+  await prisma.user.create({
+    data: {
+      email: 'staff1@citybank.com',
+      name: 'Bank Teller',
+      passwordHash,
+      role: 'STAFF',
+      providerId: p2.id,
+    },
+  });
+
+  // 4. 5 Customers
+  for (let i = 1; i <= 5; i++) {
+    await prisma.user.create({
+      data: {
+        email: `customer${i}@example.com`,
+        name: `Customer ${i}`,
+        passwordHash,
+        role: 'CUSTOMER',
+      },
     });
-    console.log(`Created Event: ${event.title}`);
   }
 
   console.log('Seeding finished successfully.');
@@ -94,7 +112,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('Seeding failed:', e);
+    console.error(e);
     process.exit(1);
   })
   .finally(async () => {

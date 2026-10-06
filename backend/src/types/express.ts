@@ -8,11 +8,13 @@
 
 import { Request } from 'express';
 
+import { Role } from '@prisma/client';
+
 /** Shape attached to req.user by middleware/authenticate.ts after JWT verification. */
 export interface RequestUser {
   id: string;
   email: string;
-  role: 'ORGANIZER' | 'CUSTOMER';
+  role: Role;
 }
 
 /** Typed request with a guaranteed req.user. Use in authenticated routes. */

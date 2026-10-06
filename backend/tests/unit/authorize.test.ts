@@ -33,14 +33,14 @@ function makeNext(): { fn: NextFunction; calls: unknown[] } {
   return { fn, calls };
 }
 
-const organizerUser: RequestUser = { id: 'org-1', email: 'org@test.com', role: 'ORGANIZER' };
+const organizerUser: RequestUser = { id: 'org-1', email: 'org@test.com', role: 'ADMIN' };
 const customerUser: RequestUser = { id: 'cust-1', email: 'cust@test.com', role: 'CUSTOMER' };
 
 // ── Tests ──────────────────────────────────────────────────────────────────
 
 describe('authorize middleware', () => {
   describe('authorize("ORGANIZER")', () => {
-    const mw = authorize('ORGANIZER');
+    const mw = authorize('ADMIN');
 
     test('ORGANIZER role → next() called with no error', () => {
       const { fn, calls } = makeNext();
@@ -82,7 +82,7 @@ describe('authorize middleware', () => {
 
   test('error body shape is preserved — code is FORBIDDEN', () => {
     const { fn, calls } = makeNext();
-    authorize('ORGANIZER')(makeReqWithUser(customerUser), {} as Response, fn);
+    authorize('ADMIN')(makeReqWithUser(customerUser), {} as Response, fn);
     const err = calls[0] as ForbiddenError;
     expect(err.code).toBe('FORBIDDEN');
     expect(typeof err.message).toBe('string');

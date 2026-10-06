@@ -109,13 +109,13 @@ Keep existing layout, components, CSS. Reuse `src/api.ts` (base `${VITE_API_URL}
 - AI-logged decisions: _(append here)_
 
 ## 6. Progress (AI updates)
-Current task: **0.2** · Last green build: 0.1
+Current task: **0.3** · Last green build: 0.2
 
 | Task | Status |
 |---|---|
 | 0.1 Scaffold | ✅ |
-| 0.2 Schema + migration + seed | 🔵 |
-| 0.3 Test harness | ⬜ |
+| 0.2 Schema + migration + seed | ✅ |
+| 0.3 Test harness | 🔵 |
 | 1.1 Auth (dual token) | ⬜ |
 | 1.2 RBAC, rate limit, CORS | ⬜ |
 | 1.3 Catalog + slot generator | ⬜ |
@@ -138,6 +138,7 @@ Current task: **0.2** · Last green build: 0.1
 
 Legend: ⬜ todo · 🔵 doing · ✅ done · ⛔ blocked
 Changelog: _(newest first)_
+- [0.2] Replaced Prisma schema, generated init migration with raw partial unique index, wrote seed script.
 - [0.1] Scaffolded backend: pino, env vars, metrics, @ alias, server.ts. Removed EventBook specifics.
 ## 7. Build Plan
 
