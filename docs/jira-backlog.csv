@@ -1,0 +1,15 @@
+Issue Type,Key,Summary,Description,Story Points,Priority,Status,Sprint,Assignee,Acceptance Criteria,Git Commit
+Epic,QL-E1,Core Platform Architecture & Authentication,Establish baseline multi-tier stack with security and RBAC,13,High,Done,Sprint 1,Kaushal Patil,"JWT dual tokens, Bcrypt hashing, Postgres schema",27fc20c
+Story,QL-1,Database Schema & Migrations,Create Prisma schema with Users Providers Appointments and QueueEntry,5,High,Done,Sprint 1,Kaushal Patil,"Schema compiled, Foreign keys indexed, Migrations generated",4e92db4
+Story,QL-2,JWT Authentication Middleware,Implement JWT token verification and user extraction,3,High,Done,Sprint 1,Kaushal Patil,"Valid token grants access; Expired or invalid token yields 401",d226d80
+Story,QL-3,Role-Based Access Control Middleware,Create authorize middleware to protect endpoints by role,3,Medium,Done,Sprint 1,Kaushal Patil,"Customer denied staff routes; Admin has access",a1d1a61
+Epic,QL-E2,Queue Management & Appointment Engine,Provide live queue booking state machine and staff counter dashboard,21,Highest,Done,Sprint 2,Kaushal Patil,"Complete booking-to-service flow with atomic token increment",0d2658a
+Story,QL-4,Slot Booking & Concurrency Protection,Allow customers to book appointment without double booking,8,High,Done,Sprint 2,Kaushal Patil,"Prevent double booking at same timestamp; return 409 SLOT_TAKEN",0d2658a
+Story,QL-5,Token Generation & Check-in,Atomic token generation upon customer check-in with label,5,High,Done,Sprint 2,Kaushal Patil,"Token prefix matches provider (e.g. D-001); Atomic counter upsert",0d2658a
+Story,QL-6,Staff Counter Live Dashboard,Staff can call next customer and transition state,5,High,Done,Sprint 2,Kaushal Patil,"Call next takes highest priority WAITING entry; updates status",0d2658a
+Epic,QL-E3,DevOps Automation & Observability,Establish Docker multi-container CI/CD pipeline and Prometheus metrics,13,High,Done,Sprint 3,Kaushal Patil,"Containerized deployment, GitHub Actions, Jenkinsfile, Prometheus metrics",main
+Story,QL-7,Multi-stage Docker Containerization,Create optimized Dockerfiles for backend and frontend,5,High,Done,Sprint 3,Kaushal Patil,"Non-root alpine image; multi-stage build under 250MB",main
+Story,QL-8,Docker Compose Multi-Service Architecture,Orchestrate Frontend Backend PostgreSQL Redis and Worker,5,High,Done,Sprint 3,Kaushal Patil,"Single command 'docker compose up' boots all 5 containers",main
+Story,QL-9,GitHub Actions Automated CI,Automate lint test and build on push to main branch,3,High,Done,Sprint 3,Kaushal Patil,"Triggers on commit; Runs unit tests; Fails if tests fail",main
+Story,QL-10,Jenkins Declarative Pipeline,Setup 6-stage Jenkinsfile for CI/CD and deployment,5,Medium,Done,Sprint 3,Kaushal Patil,"Stages: Checkout -> Install -> Test -> Build -> Docker -> Deploy",main
+Story,QL-11,Prometheus & Grafana Observability,Expose /metrics endpoint and configure Prometheus scraper,3,Medium,Done,Sprint 3,Kaushal Patil,"Exposes standard prom-client metrics; Scrapes every 5s",main

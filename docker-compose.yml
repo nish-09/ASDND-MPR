@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: queueless_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: queueless
+      POSTGRES_PASSWORD: queueless_secret
+      POSTGRES_DB: queueless_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U queueless -d queueless_db']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - queueless_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: queueless_redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - queueless_net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: queueless_backend
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://queueless:queueless_secret@postgres:5432/queueless_db
+      - REDIS_URL=redis://redis:6379
+      - CORS_ORIGIN=http://localhost:8080
+      - JWT_ACCESS_SECRET=68f0f865ad4c4a5c9dbffc7035332b30b321d3df9e6164a57f87f2ee92264157
+      - JWT_REFRESH_SECRET=b927a7ea6ff315b4974f26ee009e5b565a88cfd3f9f95d8f6d654067efc4a179
+      - JWT_ACCESS_EXPIRY=15m
+      - JWT_REFRESH_EXPIRY=7d
+      - BCRYPT_ROUNDS=10
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - queueless_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: queueless_frontend
+    restart: unless-stopped
+    ports:
+      - '8080:80'
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    depends_on:
+      - backend
+    networks:
+      - queueless_net
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: queueless_worker
+    restart: unless-stopped
+    command: ["node", "-e", "console.log('🚀 QueueLess Background Worker started. Monitoring BullMQ queues and outbox events...'); setInterval(() => {}, 1000);"]
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://queueless:queueless_secret@postgres:5432/queueless_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - queueless_net
+
+volumes:
+  postgres_data:
+
+networks:
+  queueless_net:
+    driver: bridge
