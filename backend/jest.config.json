@@ -1,0 +1,23 @@
+{
+  "testEnvironment": "node",
+  "setupFiles": ["<rootDir>/jest.setup.js"],
+  "roots": ["<rootDir>/tests"],
+  "testMatch": ["**/*.test.ts"],
+  "moduleFileExtensions": ["ts", "js", "json"],
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  },
+  "transform": {
+    "^.+\\.ts$": ["ts-jest", {
+      "tsconfig": {
+        "strict": true,
+        "esModuleInterop": true,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false
+      }
+    }]
+  },
+  "collectCoverageFrom": ["src/**/*.ts", "!src/index.ts"],
+  "coverageDirectory": "coverage",
+  "testTimeout": 30000
+}
