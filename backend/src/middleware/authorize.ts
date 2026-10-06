@@ -4,7 +4,7 @@
  * Role-check middleware factory (Layer 1 of the two-layer RBAC check).
  * Must always run AFTER authenticate.ts (requires req.user to be set).
  *
- * Usage: router.put('/events/:id', authenticate, authorize('ORGANIZER'), ...)
+ * Usage: router.put('/events/:id', authenticate, authorize('ADMIN'), ...)
  *
  * This middleware ONLY checks the user's role. It does NOT check whether the
  * user owns the specific resource — that is requireEventOwner.ts's job.

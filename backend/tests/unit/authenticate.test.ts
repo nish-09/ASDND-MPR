@@ -66,7 +66,7 @@ describe('authenticate middleware', () => {
   });
 
   test('header without Bearer prefix → UnauthorizedError', () => {
-    const token = makeToken({ sub: 'u', email: 'x@x.com', role: 'ORGANIZER' });
+    const token = makeToken({ sub: 'u', email: 'x@x.com', role: 'ADMIN' });
     const { fn, calls } = makeNext();
     authenticate(makeReq(`Token ${token}`), {} as Response, fn);
     expect(calls[0]).toBeInstanceOf(UnauthorizedError);
@@ -75,7 +75,7 @@ describe('authenticate middleware', () => {
   test('tampered signature (different secret) → UnauthorizedError', () => {
     // Sign with a different secret — middleware will reject it
     const token = makeToken(
-      { sub: 'u', email: 'x@x.com', role: 'ORGANIZER' },
+      { sub: 'u', email: 'x@x.com', role: 'ADMIN' },
       'completely-different-secret-32chars!!',
     );
     const { fn, calls } = makeNext();
@@ -86,7 +86,7 @@ describe('authenticate middleware', () => {
   test('expired token → UnauthorizedError', () => {
     // nbf set in the past, expiresIn 0s — already expired by the time verify runs
     const token = makeToken(
-      { sub: 'u', email: 'x@x.com', role: 'ORGANIZER', iat: Math.floor(Date.now() / 1000) - 10 },
+      { sub: 'u', email: 'x@x.com', role: 'ADMIN', iat: Math.floor(Date.now() / 1000) - 10 },
       SECRET,
       { expiresIn: 1 }, // 1 second — but we backdate iat, so it's expired
     );

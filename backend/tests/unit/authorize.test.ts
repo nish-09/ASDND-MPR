@@ -39,10 +39,10 @@ const customerUser: RequestUser = { id: 'cust-1', email: 'cust@test.com', role: 
 // ── Tests ──────────────────────────────────────────────────────────────────
 
 describe('authorize middleware', () => {
-  describe('authorize("ORGANIZER")', () => {
+  describe('authorize("ADMIN")', () => {
     const mw = authorize('ADMIN');
 
-    test('ORGANIZER role → next() called with no error', () => {
+    test('ADMIN role → next() called with no error', () => {
       const { fn, calls } = makeNext();
       mw(makeReqWithUser(organizerUser), {} as Response, fn);
       expect(calls).toHaveLength(1);
@@ -73,7 +73,7 @@ describe('authorize middleware', () => {
       expect(calls[0]).toBeNull();
     });
 
-    test('ORGANIZER role → ForbiddenError (wrong role)', () => {
+    test('ADMIN role → ForbiddenError (wrong role)', () => {
       const { fn, calls } = makeNext();
       mw(makeReqWithUser(organizerUser), {} as Response, fn);
       expect(calls[0]).toBeInstanceOf(ForbiddenError);
