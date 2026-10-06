@@ -15,9 +15,11 @@ export interface RequestUser {
   id: string;
   email: string;
   role: Role;
+  providerId?: string | null;
 }
 
 /** Typed request with a guaranteed req.user. Use in authenticated routes. */
 export interface AuthedRequest extends Request {
   user: RequestUser;
 }
+

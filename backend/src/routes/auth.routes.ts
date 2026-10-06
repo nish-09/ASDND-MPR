@@ -13,7 +13,8 @@ import { Router } from 'express';
 import { validate } from '../middleware/validate';
 import { asyncHandler } from '../utils/asyncHandler';
 import { RegisterSchema, LoginSchema } from '../schemas/auth.schemas';
-import { registerController, loginController } from '../controllers/auth.controller';
+import { authenticate } from '../middleware/authenticate';
+import { registerController, loginController, meController } from '../controllers/auth.controller';
 
 const router = Router();
 
@@ -22,5 +23,8 @@ router.post('/register', validate(RegisterSchema), asyncHandler(registerControll
 
 // POST /auth/login
 router.post('/login', validate(LoginSchema), asyncHandler(loginController));
+
+// GET /auth/me
+router.get('/me', authenticate, asyncHandler(meController));
 
 export { router as authRouter };

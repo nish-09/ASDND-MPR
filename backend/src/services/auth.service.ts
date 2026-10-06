@@ -26,6 +26,7 @@ export interface AuthTokenPayload {
   sub: string;   // user id
   email: string;
   role: Role;
+  providerId?: string | null;
 }
 
 export interface AuthResult {
@@ -35,6 +36,7 @@ export interface AuthResult {
     name: string;
     email: string;
     role: Role;
+    providerId?: string | null;
   };
 }
 
@@ -55,10 +57,10 @@ export async function register(input: RegisterInput): Promise<AuthResult> {
       passwordHash,
       role: input.role,
     },
-    select: { id: true, name: true, email: true, role: true },
+    select: { id: true, name: true, email: true, role: true, providerId: true },
   });
 
-  const token = signToken({ sub: user.id, email: user.email, role: user.role });
+  const token = signToken({ sub: user.id, email: user.email, role: user.role, providerId: user.providerId });
   return { token, user };
 }
 
@@ -74,8 +76,8 @@ export async function login(input: LoginInput): Promise<AuthResult> {
     throw new UnauthorizedError('Invalid email or password');
   }
 
-  const token = signToken({ sub: user.id, email: user.email, role: user.role });
-  return { token, user: { id: user.id, name: user.name, email: user.email, role: user.role } };
+  const token = signToken({ sub: user.id, email: user.email, role: user.role, providerId: user.providerId });
+  return { token, user: { id: user.id, name: user.name, email: user.email, role: user.role, providerId: user.providerId } };
 }
 
 // ── Private helpers ────────────────────────────────────────────────────────

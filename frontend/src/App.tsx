@@ -5,38 +5,36 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
-import EventDetails from './pages/EventDetails';
-import OrganizerDashboard from './pages/OrganizerDashboard';
-import CreateEvent from './pages/CreateEvent';
-import EditEvent from './pages/EditEvent';
-import MyTickets from './pages/MyTickets';
-import MockCheckout from './pages/MockCheckout';
+import BookAppointment from './pages/BookAppointment';
+import MyAppointments from './pages/MyAppointments';
+import StaffDashboard from './pages/StaffDashboard';
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* Public Routes without the MainLayout (Auth Pages) */}
+        {/* Public Routes without the MainLayout */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
         {/* Routes wrapped in the MainLayout */}
         <Route element={<MainLayout />}>
-          {/* Publicly accessible Home Page */}
+          {/* Publicly accessible Home & Booking Pages */}
           <Route path="/" element={<Home />} />
-          <Route path="/events/:id" element={<EventDetails />} />
+          <Route path="/book" element={<BookAppointment />} />
+          <Route path="/book/:providerId" element={<BookAppointment />} />
 
           {/* Protected Customer Routes */}
-          <Route element={<ProtectedRoute allowedRole="CUSTOMER" />}>
-            <Route path="/my-tickets" element={<MyTickets />} />
-            <Route path="/mock-checkout" element={<MockCheckout />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/my-appointments" element={<MyAppointments />} />
+            <Route path="/my-queue" element={<MyAppointments />} />
           </Route>
 
-          {/* Protected Organizer Routes */}
-          <Route element={<ProtectedRoute allowedRole="ORGANIZER" />}>
-            <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
-            <Route path="/organizer/events/new" element={<CreateEvent />} />
-            <Route path="/organizer/events/:id/edit" element={<EditEvent />} />
+          {/* Protected Staff & Admin Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['STAFF', 'ADMIN', 'PROVIDER']} />}>
+            <Route path="/staff/dashboard" element={<StaffDashboard />} />
+            <Route path="/staff/queue" element={<StaffDashboard />} />
+            <Route path="/organizer/dashboard" element={<StaffDashboard />} />
           </Route>
         </Route>
       </Routes>

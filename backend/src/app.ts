@@ -7,6 +7,14 @@ import { env } from '@/config/env';
 import { logger } from '@/lib/logger';
 import { metrics } from '@/lib/metrics';
 import { prisma } from '@/config/db';
+import { authRouter } from '@/routes/auth.routes';
+import { providerRouter } from '@/routes/provider.routes';
+import { appointmentRouter } from '@/routes/appointment.routes';
+import { queueRouter } from '@/routes/queue.routes';
+import { authenticate } from '@/middleware/authenticate';
+import { errorHandler } from '@/middleware/errorHandler';
+import { meController } from '@/controllers/auth.controller';
+import { asyncHandler } from '@/utils/asyncHandler';
 
 export function createApp() {
   const app = express();
@@ -42,6 +50,11 @@ export function createApp() {
 
   // API v1 router
   const apiV1 = express.Router();
+  apiV1.use('/auth', authRouter);
+  apiV1.use('/providers', providerRouter);
+  apiV1.use('/appointments', appointmentRouter);
+  apiV1.use('/queue', queueRouter);
+  apiV1.get('/me', authenticate, asyncHandler(meController));
 
   // Mount API v1
   app.use('/api/v1', apiV1);
@@ -52,10 +65,7 @@ export function createApp() {
   });
 
   // Error handler
-  app.use((err: any, _req: Request, res: Response, _next: any) => {
-    logger.error(err);
-    res.status(500).json({ error: { code: 'INTERNAL_SERVER_ERROR', message: 'Something went wrong' } });
-  });
+  app.use(errorHandler);
 
   return app;
 }

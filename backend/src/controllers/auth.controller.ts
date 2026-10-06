@@ -29,3 +29,17 @@ export async function loginController(req: Request, res: Response): Promise<void
     user: result.user,
   });
 }
+
+export async function meController(req: Request, res: Response): Promise<void> {
+  const authedUser = (req as Request & { user: import('../types/express').RequestUser }).user;
+  const { prisma } = await import('../config/db');
+  const user = await prisma.user.findUnique({
+    where: { id: authedUser.id },
+    select: { id: true, name: true, email: true, role: true, providerId: true },
+  });
+  if (!user) {
+    res.status(404).json({ error: { code: 'NOT_FOUND', message: 'User not found' } });
+    return;
+  }
+  res.status(200).json({ user });
+}

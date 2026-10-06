@@ -46,6 +46,7 @@ export function authenticate(req: Request, _res: Response, next: NextFunction): 
       id: decoded.sub,
       email: decoded.email,
       role: decoded.role as Role,
+      providerId: typeof decoded.providerId === 'string' ? decoded.providerId : null,
     };
 
     next();
