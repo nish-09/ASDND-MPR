@@ -1,0 +1,171 @@
+{
+  "dashboard": {
+    "id": 54022954807296,
+    "uid": "queueless-overview",
+    "title": "QueueLess — Real-Time Production Telemetry & Observability",
+    "tags": ["queueless", "devops", "mpr"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 2,
+    "refresh": "5s",
+    "time": {
+      "from": "now-15m",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 },
+        "type": "stat",
+        "title": "🟢 Service Health (API)",
+        "datasource": { "type": "prometheus", "uid": "ag0hmelid9d6oe" },
+        "targets": [
+          {
+            "expr": "up{job=\"queueless-api\"}",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "justifyMode": "auto"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              { "type": "value", "options": { "0": { "text": "OFFLINE", "color": "red" }, "1": { "text": "ONLINE / ACTIVE", "color": "green" } } }
+            ]
+          }
+        }
+      },
+      {
+        "id": 2,
+        "gridPos": { "h": 5, "w": 6, "x": 6, "y": 0 },
+        "type": "stat",
+        "title": "💾 Memory In Use (RSS)",
+        "datasource": { "type": "prometheus", "uid": "ag0hmelid9d6oe" },
+        "targets": [
+          {
+            "expr": "process_resident_memory_bytes{job=\"queueless-api\"} / 1048576",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "decmbytes",
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 150 },
+                { "color": "red", "value": 300 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "gridPos": { "h": 5, "w": 6, "x": 12, "y": 0 },
+        "type": "stat",
+        "title": "⚡ Node.js Heap Allocated",
+        "datasource": { "type": "prometheus", "uid": "ag0hmelid9d6oe" },
+        "targets": [
+          {
+            "expr": "nodejs_heap_size_used_bytes{job=\"queueless-api\"} / 1048576",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "decmbytes",
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "blue", "value": null },
+                { "color": "orange", "value": 100 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "gridPos": { "h": 5, "w": 6, "x": 18, "y": 0 },
+        "type": "stat",
+        "title": "🔗 Active Descriptors & Handles",
+        "datasource": { "type": "prometheus", "uid": "ag0hmelid9d6oe" },
+        "targets": [
+          {
+            "expr": "nodejs_active_handles_total{job=\"queueless-api\"}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [{ "color": "purple", "value": null }]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "gridPos": { "h": 9, "w": 12, "x": 0, "y": 5 },
+        "type": "timeseries",
+        "title": "📈 Process Memory Dynamics (RSS vs Virtual Size)",
+        "datasource": { "type": "prometheus", "uid": "ag0hmelid9d6oe" },
+        "targets": [
+          {
+            "expr": "process_resident_memory_bytes{job=\"queueless-api\"} / 1048576",
+            "legendFormat": "Resident Set Size (MB)",
+            "refId": "A"
+          },
+          {
+            "expr": "process_virtual_memory_bytes{job=\"queueless-api\"} / 1048576",
+            "legendFormat": "Virtual Memory (MB)",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "gridPos": { "h": 9, "w": 12, "x": 12, "y": 5 },
+        "type": "timeseries",
+        "title": "⏱️ Node.js Event Loop Lag (Milliseconds)",
+        "datasource": { "type": "prometheus", "uid": "ag0hmelid9d6oe" },
+        "targets": [
+          {
+            "expr": "nodejs_eventloop_lag_seconds{job=\"queueless-api\"} * 1000",
+            "legendFormat": "Event Loop Lag (ms)",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "gridPos": { "h": 8, "w": 24, "x": 0, "y": 14 },
+        "type": "timeseries",
+        "title": "🚀 Cumulative CPU Compute Time (Seconds)",
+        "datasource": { "type": "prometheus", "uid": "ag0hmelid9d6oe" },
+        "targets": [
+          {
+            "expr": "process_cpu_user_seconds_total{job=\"queueless-api\"}",
+            "legendFormat": "User CPU Seconds",
+            "refId": "A"
+          },
+          {
+            "expr": "process_cpu_system_seconds_total{job=\"queueless-api\"}",
+            "legendFormat": "System CPU Seconds",
+            "refId": "B"
+          }
+        ]
+      }
+    ]
+  },
+  "overwrite": true
+}

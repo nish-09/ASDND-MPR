@@ -5,7 +5,7 @@ import { createApp } from '@/app';
 
 async function main() {
   const app = createApp();
-  const server = app.listen(env.PORT, () => {
+  const server = app.listen(env.PORT, '0.0.0.0', () => {
     logger.info(`Server listening on port ${env.PORT} in ${env.NODE_ENV} mode`);
   });
 
